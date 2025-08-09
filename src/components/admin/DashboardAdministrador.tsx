@@ -5,6 +5,7 @@ interface Solicitud {
   id: number;
   nombre: string;
   porcentaje: number;
+  estado: 'aprobada' | 'en_proceso' | 'rechazada';
   documentos: {
     nombre: string;
     ia: boolean;
@@ -19,13 +20,20 @@ const DashboardAdministrador: React.FC = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogData, setDialogData] = useState<{title: string, imagen: string} | null>(null);
   const [selectedYear, setSelectedYear] = useState('2024');
-
-  const solicitudesPorAno: { [key: string]: Solicitud[] } = {
+  
+  // Estados para modales de confirmación
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<'aceptar' | 'rechazar' | null>(null);
+  const [solicitudToAction, setSolicitudToAction] = useState<number | null>(null);
+  
+  // Estado para las solicitudes (permite modificaciones)
+  const [solicitudesPorAnoState, setSolicitudesPorAnoState] = useState<{ [key: string]: Solicitud[] }>({
     '2024': [
       {
         id: 1,
         nombre: 'pepita perez',
         porcentaje: 66,
+        estado: 'en_proceso',
         documentos: [
           {
             nombre: 'Certidicado de Antecedentes',
@@ -57,19 +65,79 @@ const DashboardAdministrador: React.FC = () => {
         id: 2,
         nombre: 'juanita perez',
         porcentaje: 100,
-        documentos: []
+        estado: 'aprobada',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: true,
+            entidad: true,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: true,
+            entidad: true,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          },
+          {
+            nombre: 'Carnet de Identidad',
+            ia: true,
+            entidad: true,
+            imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/El_ejemplo_de_Cedula_identidad_Chile_2013.jpg'
+          },
+          {
+            nombre: 'Estampado Electrónico',
+            ia: true,
+            entidad: true,
+            imagen: 'https://i0.wp.com/www.blog.midiarioenchile.com/wp-content/uploads/2020/09/estampado-electronico-segunda-pagina-mi-diario-en-chile-tutorial.png?fit=559%2C477&ssl=1'
+          }
+        ]
       },
       {
         id: 3,
         nombre: 'gonzalo perez',
         porcentaje: 76,
-        documentos: []
+        estado: 'en_proceso',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: true,
+            entidad: true,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: true,
+            entidad: false,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          },
+          {
+            nombre: 'Carnet de Identidad',
+            ia: true,
+            entidad: true,
+            imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/El_ejemplo_de_Cedula_identidad_Chile_2013.jpg'
+          }
+        ]
       },
       {
         id: 4,
         nombre: 'pepita maria',
         porcentaje: 36,
-        documentos: []
+        estado: 'rechazada',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: false,
+            entidad: false,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: false,
+            entidad: false,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          }
+        ]
       }
     ],
     '2023': [
@@ -77,19 +145,67 @@ const DashboardAdministrador: React.FC = () => {
         id: 1,
         nombre: 'maria gonzalez',
         porcentaje: 85,
-        documentos: []
+        estado: 'aprobada',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: true,
+            entidad: true,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: true,
+            entidad: true,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          },
+          {
+            nombre: 'Carnet de Identidad',
+            ia: true,
+            entidad: true,
+            imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/El_ejemplo_de_Cedula_identidad_Chile_2013.jpg'
+          }
+        ]
       },
       {
         id: 2,
         nombre: 'carlos rodriguez',
         porcentaje: 92,
-        documentos: []
+        estado: 'aprobada',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: true,
+            entidad: true,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: true,
+            entidad: true,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          }
+        ]
       },
       {
         id: 3,
         nombre: 'ana martinez',
         porcentaje: 45,
-        documentos: []
+        estado: 'rechazada',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: false,
+            entidad: false,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: false,
+            entidad: false,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          }
+        ]
       }
     ],
     '2022': [
@@ -97,25 +213,59 @@ const DashboardAdministrador: React.FC = () => {
         id: 1,
         nombre: 'luis hernandez',
         porcentaje: 78,
-        documentos: []
+        estado: 'en_proceso',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: true,
+            entidad: true,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: true,
+            entidad: false,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          }
+        ]
       },
       {
         id: 2,
         nombre: 'sofia lopez',
         porcentaje: 88,
-        documentos: []
+        estado: 'aprobada',
+        documentos: [
+          {
+            nombre: 'Certificado de Antecedentes',
+            ia: true,
+            entidad: true,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: true,
+            entidad: true,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          },
+          {
+            nombre: 'Carnet de Identidad',
+            ia: true,
+            entidad: true,
+            imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/El_ejemplo_de_Cedula_identidad_Chile_2013.jpg'
+          }
+        ]
       }
     ]
-  };
+  });
 
-  const solicitudes = solicitudesPorAno[selectedYear] || [];
+  const solicitudes = solicitudesPorAnoState[selectedYear] || [];
 
   // Calcular estadísticas del año seleccionado
   const estadisticas = {
     totalSolicitudes: solicitudes.length,
-    aprobadas: solicitudes.filter(s => s.porcentaje >= 80).length,
-    enProceso: solicitudes.filter(s => s.porcentaje >= 50 && s.porcentaje < 80).length,
-    rechazadas: solicitudes.filter(s => s.porcentaje < 50).length,
+    aprobadas: solicitudes.filter(s => s.estado === 'aprobada').length,
+    enProceso: solicitudes.filter(s => s.estado === 'en_proceso').length,
+    rechazadas: solicitudes.filter(s => s.estado === 'rechazada').length,
     promedioAprobacion: solicitudes.length > 0 
       ? Math.round(solicitudes.reduce((sum, s) => sum + s.porcentaje, 0) / solicitudes.length)
       : 0
@@ -133,6 +283,39 @@ const DashboardAdministrador: React.FC = () => {
   const handleCloseDialog = () => {
     setShowDialog(false);
     setDialogData(null);
+  };
+
+  const handleConfirmAction = (action: 'aceptar' | 'rechazar', solicitudId: number) => {
+    setConfirmAction(action);
+    setSolicitudToAction(solicitudId);
+    setShowConfirmModal(true);
+  };
+
+  const handleExecuteAction = () => {
+    if (confirmAction && solicitudToAction) {
+      setSolicitudesPorAnoState(prev => ({
+        ...prev,
+        [selectedYear]: prev[selectedYear].map(solicitud => 
+          solicitud.id === solicitudToAction 
+            ? {
+                ...solicitud,
+                estado: confirmAction === 'aceptar' ? 'aprobada' : 'rechazada',
+                porcentaje: confirmAction === 'aceptar' ? 100 : 0
+              }
+            : solicitud
+        )
+      }));
+      
+      setShowConfirmModal(false);
+      setConfirmAction(null);
+      setSolicitudToAction(null);
+    }
+  };
+
+  const handleCancelAction = () => {
+    setShowConfirmModal(false);
+    setConfirmAction(null);
+    setSolicitudToAction(null);
   };
 
   return (
@@ -315,8 +498,18 @@ const DashboardAdministrador: React.FC = () => {
                         ))}
                       </table>
                       <div className="l-to-r sd-20">
-                        <button className="btn btn-secundary btn-small sr-20">Rechazar</button>
-                        <button className="btn btn-primary btn-small">Aceptar</button>
+                        <button 
+                          className="btn btn-secundary btn-small sr-20"
+                          onClick={() => handleConfirmAction('rechazar', solicitud.id)}
+                        >
+                          Rechazar
+                        </button>
+                        <button 
+                          className="btn btn-primary btn-small"
+                          onClick={() => handleConfirmAction('aceptar', solicitud.id)}
+                        >
+                          Aceptar
+                        </button>
                       </div>
                     </div>
                   )}
@@ -327,6 +520,82 @@ const DashboardAdministrador: React.FC = () => {
         </div>
       </div>
 
+      {/* Modal de confirmación */}
+      {showConfirmModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '30px',
+            borderRadius: '15px',
+            maxWidth: '400px',
+            width: '90%',
+            textAlign: 'center',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{
+              fontSize: '60px',
+              marginBottom: '20px'
+            }}>
+              {confirmAction === 'aceptar' ? '✅' : '❌'}
+            </div>
+            <h3 style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
+              margin: '0 0 15px 0',
+              color: confirmAction === 'aceptar' ? '#0E891A' : '#BF0238'
+            }}>
+              ¿Estás seguro?
+            </h3>
+            <p style={{
+              fontSize: '16px',
+              color: '#666',
+              margin: '0 0 25px 0',
+              lineHeight: '1.5'
+            }}>
+              {confirmAction === 'aceptar' 
+                ? '¿Deseas aprobar esta solicitud? Esta acción no se puede deshacer.'
+                : '¿Deseas rechazar esta solicitud? Esta acción no se puede deshacer.'
+              }
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'center'
+            }}>
+              <button 
+                className="btn btn-secundary btn-large"
+                onClick={handleCancelAction}
+                style={{ minWidth: '100px' }}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn btn-primary btn-large"
+                onClick={handleExecuteAction}
+                style={{ 
+                  minWidth: '100px',
+                  backgroundColor: confirmAction === 'aceptar' ? '#0E891A' : '#BF0238'
+                }}
+              >
+                {confirmAction === 'aceptar' ? 'Aprobar' : 'Rechazar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de documento */}
       {showDialog && dialogData && (
         <div style={{
           position: 'fixed',
