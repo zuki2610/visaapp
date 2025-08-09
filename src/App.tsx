@@ -7,6 +7,7 @@ import AplicanteHome from './components/aplicante/AplicanteHome';
 import SolicitarResidencia from './components/aplicante/SolicitarResidencia';
 import EstadoSolicitud from './components/aplicante/EstadoSolicitud';
 import ResultadoSolicitud from './components/aplicante/ResultadoSolicitud';
+import Apelaciones from './components/aplicante/Apelaciones';
 
 // Componentes del panel administrativo
 import LoginAdmin from './components/admin/LoginAdmin';
@@ -25,6 +26,7 @@ function App() {
           <Route path="/solicitar" element={<SolicitarResidencia />} />
           <Route path="/estado" element={<EstadoSolicitud />} />
           <Route path="/resultado" element={<ResultadoSolicitud />} />
+          <Route path="/apelaciones" element={<Apelaciones />} />
           
           {/* Rutas del panel administrativo */}
           <Route path="/admin/login" element={<LoginAdmin />} />

@@ -22,7 +22,7 @@ const AplicanteHome: React.FC = () => {
             <Link to="/estado" className="link-estandar sd-15">
               Ver estado de mi solicitud
             </Link>
-            <Link to="#" className="link-estandar sd-15">
+            <Link to="/apelaciones" className="link-estandar sd-15">
               Apelaciones
             </Link>
             <Link to="#" className="link-estandar sd-15">

@@ -89,7 +89,7 @@ const EstadoSolicitud: React.FC = () => {
                   {getEstadoText()}
                 </p>
                 {estadoSolicitud === 'rechazada' && (
-                  <Link to="#" className="normal-link-estandar su-20">
+                  <Link to="/apelaciones" className="normal-link-estandar su-20">
                     Presentar apelación
                   </Link>
                 )}

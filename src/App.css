@@ -611,3 +611,62 @@ img#reportImg {
   height: auto;
   padding: 20px;
 }
+
+/* Estilos para documentos rechazados */
+.documento-rechazado {
+  margin-bottom: 20px;
+}
+
+.documento-rechazado .estado {
+  border: 2px solid #BF0238;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.documento-rechazado h4 {
+  margin: 0 0 10px 0;
+  color: #BF0238;
+  font-weight: 600;
+}
+
+.documento-rechazado p {
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+/* Estilos para textarea */
+textarea.text-estandar {
+  width: 90%;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: inherit;
+}
+
+textarea.text-estandar:focus {
+  outline: none;
+  border: 2px solid #0f69b4;
+}
+
+/* Estilos para botones deshabilitados */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estilos para archivos seleccionados */
+.file-selected {
+  color: #0E891A;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+/* Estilos para mensajes de advertencia */
+.warning-message {
+  color: #BF0238;
+  font-size: 14px;
+  margin-top: 10px;
+  font-weight: 500;
+}
