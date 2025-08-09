@@ -18,58 +18,108 @@ const DashboardAdministrador: React.FC = () => {
   const [selectedSolicitud, setSelectedSolicitud] = useState<number | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogData, setDialogData] = useState<{title: string, imagen: string} | null>(null);
+  const [selectedYear, setSelectedYear] = useState('2024');
 
-  const solicitudes: Solicitud[] = [
-    {
-      id: 1,
-      nombre: 'pepita perez',
-      porcentaje: 66,
-      documentos: [
-        {
-          nombre: 'Certidicado de Antecedentes',
-          ia: true,
-          entidad: false,
-          imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
-        },
-        {
-          nombre: 'Pasaporte',
-          ia: false,
-          entidad: false,
-          imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
-        },
-        {
-          nombre: 'Carnet',
-          ia: true,
-          entidad: true,
-          imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/El_ejemplo_de_Cedula_identidad_Chile_2013.jpg'
-        },
-        {
-          nombre: 'Estampado Electrónico',
-          ia: true,
-          entidad: true,
-          imagen: 'https://i0.wp.com/www.blog.midiarioenchile.com/wp-content/uploads/2020/09/estampado-electronico-segunda-pagina-mi-diario-en-chile-tutorial.png?fit=559%2C477&ssl=1'
-        }
-      ]
-    },
-    {
-      id: 2,
-      nombre: 'juanita perez',
-      porcentaje: 100,
-      documentos: []
-    },
-    {
-      id: 3,
-      nombre: 'gonzalo perez',
-      porcentaje: 76,
-      documentos: []
-    },
-    {
-      id: 4,
-      nombre: 'pepita maria',
-      porcentaje: 36,
-      documentos: []
-    }
-  ];
+  const solicitudesPorAno: { [key: string]: Solicitud[] } = {
+    '2024': [
+      {
+        id: 1,
+        nombre: 'pepita perez',
+        porcentaje: 66,
+        documentos: [
+          {
+            nombre: 'Certidicado de Antecedentes',
+            ia: true,
+            entidad: false,
+            imagen: 'https://immichile.cl/wp/wp-content/uploads/2019/11/certificado-de-antecedentes-penales-para-fines-especiales.png'
+          },
+          {
+            nombre: 'Pasaporte',
+            ia: false,
+            entidad: false,
+            imagen: 'https://thumbs.dreamstime.com/z/pasaporte-del-ejemplo-con-datos-biom%C3%A9tricos-112354991.jpg'
+          },
+          {
+            nombre: 'Carnet',
+            ia: true,
+            entidad: true,
+            imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/El_ejemplo_de_Cedula_identidad_Chile_2013.jpg'
+          },
+          {
+            nombre: 'Estampado Electrónico',
+            ia: true,
+            entidad: true,
+            imagen: 'https://i0.wp.com/www.blog.midiarioenchile.com/wp-content/uploads/2020/09/estampado-electronico-segunda-pagina-mi-diario-en-chile-tutorial.png?fit=559%2C477&ssl=1'
+          }
+        ]
+      },
+      {
+        id: 2,
+        nombre: 'juanita perez',
+        porcentaje: 100,
+        documentos: []
+      },
+      {
+        id: 3,
+        nombre: 'gonzalo perez',
+        porcentaje: 76,
+        documentos: []
+      },
+      {
+        id: 4,
+        nombre: 'pepita maria',
+        porcentaje: 36,
+        documentos: []
+      }
+    ],
+    '2023': [
+      {
+        id: 1,
+        nombre: 'maria gonzalez',
+        porcentaje: 85,
+        documentos: []
+      },
+      {
+        id: 2,
+        nombre: 'carlos rodriguez',
+        porcentaje: 92,
+        documentos: []
+      },
+      {
+        id: 3,
+        nombre: 'ana martinez',
+        porcentaje: 45,
+        documentos: []
+      }
+    ],
+    '2022': [
+      {
+        id: 1,
+        nombre: 'luis hernandez',
+        porcentaje: 78,
+        documentos: []
+      },
+      {
+        id: 2,
+        nombre: 'sofia lopez',
+        porcentaje: 88,
+        documentos: []
+      }
+    ]
+  };
+
+  const solicitudes = solicitudesPorAno[selectedYear] || [];
+
+  // Calcular estadísticas del año seleccionado
+  const estadisticas = {
+    totalSolicitudes: solicitudes.length,
+    aprobadas: solicitudes.filter(s => s.porcentaje >= 80).length,
+    enProceso: solicitudes.filter(s => s.porcentaje >= 50 && s.porcentaje < 80).length,
+    rechazadas: solicitudes.filter(s => s.porcentaje < 50).length,
+    promedioAprobacion: solicitudes.length > 0 
+      ? Math.round(solicitudes.reduce((sum, s) => sum + s.porcentaje, 0) / solicitudes.length)
+      : 0
+  };
 
   const handleShowSolicitud = (id: number) => {
     setSelectedSolicitud(selectedSolicitud === id ? null : id);
@@ -90,6 +140,40 @@ const DashboardAdministrador: React.FC = () => {
       <div className="centrado">
         <div className="sd-40 su-20">
           <h1 className="x28">Portal del Administrador</h1>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '10px',
+            marginTop: '20px'
+          }}>
+            <label htmlFor="year-selector" style={{ 
+              fontSize: '16px', 
+              fontWeight: '500',
+              color: '#383838'
+            }}>
+              Año:
+            </label>
+            <select 
+              id="year-selector"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+            </select>
+          </div>
         </div>
         <div className="nav">
           <div 
@@ -100,6 +184,71 @@ const DashboardAdministrador: React.FC = () => {
           </div>
           <div className="nav-item">
             <Link to="/admin/login">Cerrar Sesión</Link>
+          </div>
+        </div>
+        
+        {/* Panel de estadísticas */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '20px',
+          marginBottom: '20px',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{
+            backgroundColor: '#CCF1C1',
+            color: '#0E891A',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            minWidth: '120px'
+          }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{estadisticas.totalSolicitudes}</div>
+            <div style={{ fontSize: '14px' }}>Total</div>
+          </div>
+          <div style={{
+            backgroundColor: '#C0E9FD',
+            color: '#007DB7',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            minWidth: '120px'
+          }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{estadisticas.aprobadas}</div>
+            <div style={{ fontSize: '14px' }}>Aprobadas</div>
+          </div>
+          <div style={{
+            backgroundColor: '#FFF3CD',
+            color: '#856404',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            minWidth: '120px'
+          }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{estadisticas.enProceso}</div>
+            <div style={{ fontSize: '14px' }}>En Proceso</div>
+          </div>
+          <div style={{
+            backgroundColor: '#F9D4D5',
+            color: '#BF0238',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            minWidth: '120px'
+          }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{estadisticas.rechazadas}</div>
+            <div style={{ fontSize: '14px' }}>Rechazadas</div>
+          </div>
+          <div style={{
+            backgroundColor: '#E2E3E5',
+            color: '#383838',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            minWidth: '120px'
+          }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{estadisticas.promedioAprobacion}%</div>
+            <div style={{ fontSize: '14px' }}>Promedio</div>
           </div>
         </div>
         
