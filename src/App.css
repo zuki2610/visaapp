@@ -615,12 +615,17 @@ img#reportImg {
 /* Estilos para documentos rechazados */
 .documento-rechazado {
   margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .documento-rechazado .estado {
   border: 2px solid #BF0238;
   border-radius: 8px;
   padding: 15px;
+  width: 90%;
+  max-width: 500px;
 }
 
 .documento-rechazado h4 {
